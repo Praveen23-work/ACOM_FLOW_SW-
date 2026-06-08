@@ -1133,16 +1133,23 @@ static void save_posted_log(const char *log_line) {
 }
 
 
-void clear_posted_logs(void) {
-    FILE *file = fopen(posted_log_file_path, "w"); // open in write mode to truncate
-    if (!file) {
-        ESP_LOGE("POST_LOG", "Failed to clear posted logs file");
-        return;
+void clear_posted_logs(void)
+{
+    FILE *f = fopen(posted_log_file_path, "wb");
+    if (f)
+    {
+        fclose(f);
+        posted_log_count = 0;
+        ESP_LOGI("POST_LOG", "Posted logs cleared");
     }
-    fclose(file);
-
-    posted_log_count = 0;
-    ESP_LOGI("POST_LOG", "Posted logs cleared");
+    else
+    {
+        // Not an error after fresh format
+        ESP_LOGW("POST_LOG", "Could not clear posted logs (errno=%d) — "
+                 "file may not exist yet, this is normal after format",
+                 errno);
+        posted_log_count = 0;
+    }
 }
 
 // Print all posted logs
@@ -1627,19 +1634,21 @@ void set_failed_offset(size_t failed_off)
 {
     size_t actual_file_size = get_file_size();
 
-    /* Never set failed_offset past what SPIFFS has actually flushed.
-     * curr_log_offset in RAM advances on every write_log_entry call,
-     * but stat() can lag. If we store a RAM-ahead offset as failed_offset
-     * it becomes permanently un-seekable. Clamp to file_size as floor. */
+    /* curr_log_offset now always equals file_size after Fix 1,
+     * so failed_off should never exceed file_size. If it does,
+     * the log write actually failed — anchor to real EOF. */
     if (actual_file_size > 0 && failed_off > actual_file_size) {
-        ESP_LOGW("SET_FAILED", "Clamping failed_offset %zu → %zu (file_size=%zu)",
-                 failed_off, actual_file_size, actual_file_size);
-        failed_off = actual_file_size > MAX_LINE_LEN ? actual_file_size - MAX_LINE_LEN : 0;
+        ESP_LOGW("SET_FAILED",
+                 "failed_offset %zu > file_size %zu — clamping to file_size",
+                 failed_off, actual_file_size);
+        failed_off = actual_file_size;
     }
 
-    is_failed = true;
-    failed_offset = failed_off;
+    is_failed      = true;
+    failed_offset  = failed_off;
     save_post_state_blob(failed_offset, post_wrap, is_failed);
+    ESP_LOGW("SET_FAILED", "failed_offset set to %zu (file_size=%zu)",
+             failed_offset, actual_file_size);
 }
 
 size_t get_failed_offset()
