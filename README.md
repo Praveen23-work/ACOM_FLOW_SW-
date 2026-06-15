@@ -1,4 +1,4 @@
-ACOM UPDATED VERSION as of april 23.
+ACOM UPDATED VERSION as of June 15.
 
 (See the README.md file in the upper level 'examples' directory for more information about examples.)
 
