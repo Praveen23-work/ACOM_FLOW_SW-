@@ -1607,7 +1607,18 @@ void collect_and_log(void)
     sensors[TPA].value = temperature;
     ESP_LOGE("POLL", "A-Temperature: %f", temperature);
 
-    /* ADC */
+	/* Pump Feedback Relay (SW1ob) */
+    // Note: SW1 is GPIO 34
+    sensors[SW1ob].value = (float)(!gpio_get_level(SW1));
+    ESP_LOGI("POLL", "Pump Feedback (SW1ob): %.0f", sensors[SW1ob].value);
+
+	// /* --- HIJACK UFM_Test FOR PUMP FEEDBACK --- */
+    // // Reading SW1 (GPIO 34, mapped to OP1 terminal)
+    // // Overwrites any Modbus failure zeroes for UFM_Test
+    // sensors[UFM_Test].value = (float)(!gpio_get_level(SW1));
+    // ESP_LOGI("POLL", "Pump Feedback (UFM-T): %.0f", sensors[UFM_Test].value);
+    
+	/* ADC */
     status.battery_level = BatteryPercentage(sampled_voltage1);
     status.solar_level   = SOLARPercentage(sampled_voltage2);
     ESP_LOGW("BATT_DBG",
@@ -2177,6 +2188,7 @@ void init_flow_buzz_gpio()
 	 gpio_set_direction(on_board_sw1, GPIO_MODE_INPUT);
 	 gpio_set_direction(on_board_sw2, GPIO_MODE_INPUT);
 
+	 gpio_set_pull_mode(on_board_sw1, GPIO_PULLUP_ONLY);
 	 gpio_set_direction(SW1, GPIO_MODE_INPUT);
 	 gpio_set_direction(SW2, GPIO_MODE_INPUT);
 

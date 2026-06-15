@@ -15,7 +15,7 @@
 
 #define SENSOR_NAMESPACE "sensor_config"
 #define SENSOR_KEY       "sensors"
-#define MAX_SENSORS      17
+#define MAX_SENSORS      18
 
 extern int sensor_count;
 static const char *TAG_NVS = "NVS";
@@ -52,7 +52,7 @@ typedef enum{
     TPA= SENSOR_TYPE_COUNT,
     FLW,
     SW1ob, // onboard switch 1
-    SW2ob,
+    SW2ob, // onboard switch 2 BLE
 } reg_sensor_e;
 
 typedef struct {

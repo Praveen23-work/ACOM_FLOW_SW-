@@ -230,7 +230,7 @@ void init_default_sensors()
         /* --- NON-MODBUS EXTRA REG SENSORS (ORDERED BY reg_sensor_e) --- */
         [TPA]             = {"TempA",             "TPA",     true, false,0.0, 1.00, 0.0, false},
         [FLW]             = {"Flow Sensor",       "FLW",     true, false,0.0, 1.00, 0.0, false},
-        [SW1ob]           = {"Sw1 onboard",       "SW1ob",     true, false,0.0, 1.00, 0.0, false},
+        [SW1ob]           = {"Flow Switch",       "FLOW_SW",     true, false,0.0, 1.00, 0.0, false},
         [SW2ob]           = {"Sw2 oboard",        "SW2ob",     true, false,0.0, 1.00, 0.0, false}
     };
     memcpy(sensors, default_sensors, sizeof(default_sensors));
