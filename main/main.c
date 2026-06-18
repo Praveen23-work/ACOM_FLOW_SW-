@@ -2072,15 +2072,16 @@ void sensor_modbus_requests()
 			//  printf("UFM Test: %f\n",test);
 			 break;
 
-        case UFM1_FLOW: // Cumulative Flow (Register 1443)
-			// Converted cuubic metres to Liters by multiplying by 1000
-			sensors[UFM1_FLOW].value  = decodeModbusResponse_Cumulative(resp)* 1000.0;
-            // ufFlowVal = (resp[3] << 8) | resp[4];
-            printf("UFM1 Cumulative Flow: %.2f Liters\n",  sensors[UFM1_FLOW].value );
+		case UFM1_FLOW: // Cumulative Flow 
+			// 	sensors[UFM1_FLOW].value  = decodeModbusResponse_Cumulative(resp)* 1000.0;
+			// Removed * 1000.0 to keep the value in Cubic Meters to match UFM display
+			sensors[UFM1_FLOW].value  = decodeModbusResponse_Cumulative(resp);
+            printf("UFM1 Cumulative Flow: %.2f m3\n",  sensors[UFM1_FLOW].value );
             break;
 
         case UFM1_VOLUME: // Instantaneous Flow Rate (Register 1447)
-		 	sensors[UFM1_VOLUME].value  = decodeModbusResponse_UFM(resp)* 1000.0; // Floating point
+		 	// sensors[UFM1_VOLUME].value  = decodeModbusResponse_UFM(resp)* 1000.0; // Floating point
+			sensors[UFM1_VOLUME].value  = decodeModbusResponse_UFM(resp); // Floating point
 
 			// FORMULA for decimal point conversion
 
@@ -2091,24 +2092,16 @@ void sensor_modbus_requests()
             printf("UFM1 Volume: %f\n",  sensors[UFM1_VOLUME].value );
             break;
 
-		case UFM2_FLOW: // Cumulative flow (Register 1443)
-             // Now using cumulative decode function for Sensor 2
-             sensors[UFM2_FLOW].value = decodeModbusResponse_Cumulative(resp)* 1000.0;
-             
-             // Debug print
-             printf("UFM2 Cumulative Flow: %.2f Liters\n", sensors[UFM2_FLOW].value);
+		case UFM2_FLOW: // Cumulative flow 
+			//  sensors[UFM2_FLOW].value = decodeModbusResponse_Cumulative(resp)* 1000.0;
+			// Removed * 1000.0 to keep the value in Cubic Meters to match UFM display
+             sensors[UFM2_FLOW].value = decodeModbusResponse_Cumulative(resp);
+             printf("UFM2 Cumulative Flow: %.2f m3\n", sensors[UFM2_FLOW].value);
              break;
-
-		case UFM2_VOLUME: // (Register 1447)
-		 	sensors[UFM2_VOLUME].value  = decodeModbusResponse_UFM(resp) * 1000.0; // Floating point
-
-			// FORMULA for decimal point conversion
-
-			//  sensors[UFM1_FLOW].value = 0; // Store final value in this
-			//  sensors[UFM1_VOLUME].value  = 0.0;
 		
-            // ufVolumeVal = (resp[3] << 8) | resp[4];
-            printf("UFM2 Volume: %f\n",  sensors[UFM2_VOLUME].value );
+		case UFM2_VOLUME: 
+		 	sensors[UFM2_VOLUME].value  = decodeModbusResponse_UFM(resp); 
+            printf("UFM2 Volume: %.3f m3/h\n",  sensors[UFM2_VOLUME].value );
             break;
 
 		case WEIGHT_SENSOR:

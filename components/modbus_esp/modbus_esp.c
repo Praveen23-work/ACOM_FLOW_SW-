@@ -335,71 +335,33 @@ void MODBUS_handler( uint8_t SensorSelect, uint8_t *modbusRequest)
      len_of_response_num = (5 + num_registers * 2);
     //  ESP_LOGW("Mod_LEN", "Expected Response Length: %d\n",len_of_response_num);
 }
-// else if (SensorSelect == UFM1_FLOW) {
 
-//     // 0x04,  // Slave Address
-//     // 0x03,  // Function Code
-//     // 0x00,  // Start Address High
-//     // 0X05,  // Start Address Low
-//     // 0x00,  // Quantity High
-//     // 0x02,  // Quantity Low
-//     // 0XD4,  // CRC Low
-//     // 0X5F   // CRC High
-
-//   /*  Adrs | num of reg | data type |  Content  |         Unit         */
-//   /*  1449 |      2     | IEEE754   | flowrate  | Unit: meterpersecond */
-
-//     // Serial.println("UFM_FLOW");
-//     modbusRequest[0] = 0X01;  // SLAVE-ID
-//     modbusRequest[1] = 0X03;  // FUN-CODE
-//     modbusRequest[2] = 0X05;  // START-ADD-HIGH
-//     modbusRequest[3] = 0XA9;  // START-ADD-LOW
-//     modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
-//     modbusRequest[5] = 0X02;  // NO-OF-REG-LOW
-//     modbusRequest[6] = 0X14;
-//     modbusRequest[7] = 0XE7;
-
-//      uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
-
-//     // Response: Slave ID (1) + Function Code (1) + Byte Count (1) + N*2 bytes + CRC (2)
-//      len_of_response_num = (5 + num_registers * 2);
-//     //  ESP_LOGW("Mod_LEN", "Expected Response Length: %d\n",len_of_response_num);
-
-//     // SensorSelect = 0;
-// } 
-else if (SensorSelect == UFM1_FLOW) {
-    // Reading Net Cumulative Flow (Address 1443 decimal = 0x05A3 hex)
-    // Reading 3 Registers (1443, 1444, 1445)
-
+  else if (SensorSelect == UFM1_FLOW) {
+    // Reading Positive Cumulative Flow (Address 1464 -> 0x05B7) read 1463 in modbus
+    // Sending exactly: 01 03 05 B7 00 02 74 E1
     modbusRequest[0] = 0X01;  // SLAVE-ID
     modbusRequest[1] = 0X03;  // FUN-CODE
-    modbusRequest[2] = 0X05;  // START-ADD-HIGH (0x05)
-    modbusRequest[3] = 0XA3;  // START-ADD-LOW  (0xA3 = 1443)
+    modbusRequest[2] = 0X05;  // START-ADD-HIGH
+    modbusRequest[3] = 0XB7;  // START-ADD-LOW  (0xB7)
     modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
-    modbusRequest[5] = 0X03;  // NO-OF-REG-LOW  (Reading 3 registers)
-    
-    // CRC for 01 03 05 A3 00 03 is 0x25F5
-    modbusRequest[6] = 0XF5;  // CRC LOW
-    modbusRequest[7] = 0X25;  // CRC HIGH
+    modbusRequest[5] = 0X02;  // NO-OF-REG-LOW  (2 registers)
+    modbusRequest[6] = 0X74;  // CRC LOW
+    modbusRequest[7] = 0XE1;  // CRC HIGH
 
     uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
     len_of_response_num = (5 + num_registers * 2);
-
-  } 
+  }
   
   else if (SensorSelect == UFM2_FLOW) {
-    // Reading Net Cumulative Flow for Slave 2
-    
+    // Reading Positive Cumulative Flow for Slave 2
     modbusRequest[0] = 0X02;  // SLAVE-ID
     modbusRequest[1] = 0X03;  // FUN-CODE
     modbusRequest[2] = 0X05;  // START-ADD-HIGH
-    modbusRequest[3] = 0XA3;  // START-ADD-LOW  (0xA3 = 1443)
+    modbusRequest[3] = 0XB7;  // START-ADD-LOW  
     modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
-    modbusRequest[5] = 0X03;  // NO-OF-REG-LOW  (Reading 3 registers)
-
-    // CRC for 02 03 05 A3 00 03 is 0x16F5
-    modbusRequest[6] = 0XF5;  // CRC LOW
-    modbusRequest[7] = 0X16;  // CRC HIGH
+    modbusRequest[5] = 0X02;  // NO-OF-REG-LOW  
+    modbusRequest[6] = 0X74;  // CRC LOW
+    modbusRequest[7] = 0XD2;  // CRC HIGH
 
     uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
     len_of_response_num = (5 + num_registers * 2);
@@ -423,38 +385,8 @@ else if (SensorSelect == UFM1_FLOW) {
 
     // Response: Slave ID (1) + Function Code (1) + Byte Count (1) + N*2 bytes + CRC (2)
      len_of_response_num = (5 + num_registers * 2);
-  }
-//   else if (SensorSelect == UFM2_FLOW) {
-
-//     // 0x04,  // Slave Address
-//     // 0x03,  // Function Code
-//     // 0x00,  // Start Address High
-//     // 0X05,  // Start Address Low
-//     // 0x00,  // Quantity High
-//     // 0x02,  // Quantity Low
-//     // 0XD4,  // CRC Low
-//     // 0X5F   // CRC High
-
-// //1443
-
-//     // Serial.println("UFM_FLOW");
-//     modbusRequest[0] = 0X02;  // SLAVE-ID
-//     modbusRequest[1] = 0X03;  // FUN-CODE
-//     modbusRequest[2] = 0X05;  // START-ADD-HIGH
-//     modbusRequest[3] = 0XA9;  // START-ADD-LOW
-//     modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
-//     modbusRequest[5] = 0X02;  // NO-OF-REG-LOW
-//     modbusRequest[6] = 0X14;
-//     modbusRequest[7] = 0XD4;
-
-//      uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
-
-//     // Response: Slave ID (1) + Function Code (1) + Byte Count (1) + N*2 bytes + CRC (2)
-//      len_of_response_num = (5 + num_registers * 2);
-//     //  ESP_LOGW("Mod_LEN", "Expected Response Length: %d\n",len_of_response_num);
-
-//     // SensorSelect = 0;
-  // } 
+   }
+  
   else if (SensorSelect == UFM2_VOLUME) {
 
 //1445
@@ -558,25 +490,43 @@ float decodeModbusResponse_UFM( uint8_t *floatBytes)
 }
 
 
+// float decodeModbusResponse_Cumulative(uint8_t *receivedData)
+// {
+//     // Register 1443 & 1444: Long (32-bit signed integer) N
+//     // Modbus is typically Big-Endian for Integers. 
+//     // receivedData[3] = 1443 High
+//     // receivedData[4] = 1443 Low
+//     // receivedData[5] = 1444 High
+//     // receivedData[6] = 1444 Low
+    
+//     int32_t N = (int32_t)( (receivedData[3] << 24) | (receivedData[4] << 16) | (receivedData[5] << 8) | receivedData[6] );
+
+//     // Register 1445: Integer (16-bit signed) m
+//     // receivedData[7] = 1445 High
+//     // receivedData[8] = 1445 Low
+    
+//     int16_t m = (int16_t)( (receivedData[7] << 8) | receivedData[8] );
+
+//     // Formula from Manual Note 5: Value = N * 10^(m-3)
+//     float result = (float)N * pow(10, m - 3);
+
+//     return result;
+// }
+
 float decodeModbusResponse_Cumulative(uint8_t *receivedData)
 {
-    // Register 1443 & 1444: Long (32-bit signed integer) N
-    // Modbus is typically Big-Endian for Integers. 
-    // receivedData[3] = 1443 High
-    // receivedData[4] = 1443 Low
-    // receivedData[5] = 1444 High
-    // receivedData[6] = 1444 Low
-    
-    int32_t N = (int32_t)( (receivedData[3] << 24) | (receivedData[4] << 16) | (receivedData[5] << 8) | receivedData[6] );
+    // RX Frame Example: 01 03 04 [00 04] [00 00] [CRC] [CRC]
+    // receivedData[3] & [4] = Low Word (e.g., 00 04)
+    // receivedData[5] & [6] = High Word (e.g., 00 00)
 
-    // Register 1445: Integer (16-bit signed) m
-    // receivedData[7] = 1445 High
-    // receivedData[8] = 1445 Low
-    
-    int16_t m = (int16_t)( (receivedData[7] << 8) | receivedData[8] );
+    uint16_t low_word = (receivedData[3] << 8) | receivedData[4];
+    uint16_t high_word = (receivedData[5] << 8) | receivedData[6];
 
-    // Formula from Manual Note 5: Value = N * 10^(m-3)
-    float result = (float)N * pow(10, m - 3);
+    // Combine into a 32-bit signed integer (Little-Endian order)
+    int32_t N = (int32_t)((high_word << 16) | low_word);
+
+    // Apply the 0.1 multiplier (since exponent m = 2)
+    float result = (float)N * 0.1f;
 
     return result;
 }
