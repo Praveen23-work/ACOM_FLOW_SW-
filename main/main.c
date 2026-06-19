@@ -2075,13 +2075,15 @@ void sensor_modbus_requests()
 		case UFM1_FLOW: // Cumulative Flow 
 			// 	sensors[UFM1_FLOW].value  = decodeModbusResponse_Cumulative(resp)* 1000.0;
 			// Removed * 1000.0 to keep the value in Cubic Meters to match UFM display
-			sensors[UFM1_FLOW].value  = decodeModbusResponse_Cumulative(resp);
-            printf("UFM1 Cumulative Flow: %.2f m3\n",  sensors[UFM1_FLOW].value );
+			// sensors[UFM1_FLOW].value  = decodeModbusResponse_Cumulative(resp);
+			sensors[UFM1_FLOW].value  = decodeModbusResponse_UFM(resp);
+            printf("UFM1 Flow: %.2f m3\n",  sensors[UFM1_FLOW].value );
             break;
 
         case UFM1_VOLUME: // Instantaneous Flow Rate (Register 1447)
 		 	// sensors[UFM1_VOLUME].value  = decodeModbusResponse_UFM(resp)* 1000.0; // Floating point
-			sensors[UFM1_VOLUME].value  = decodeModbusResponse_UFM(resp); // Floating point
+			// sensors[UFM1_VOLUME].value  = decodeModbusResponse_UFM(resp); // Floating point
+			sensors[UFM1_VOLUME].value  = decodeModbusResponse_Cumulative(resp); // Floating point
 
 			// FORMULA for decimal point conversion
 
@@ -2095,12 +2097,14 @@ void sensor_modbus_requests()
 		case UFM2_FLOW: // Cumulative flow 
 			//  sensors[UFM2_FLOW].value = decodeModbusResponse_Cumulative(resp)* 1000.0;
 			// Removed * 1000.0 to keep the value in Cubic Meters to match UFM display
-             sensors[UFM2_FLOW].value = decodeModbusResponse_Cumulative(resp);
-             printf("UFM2 Cumulative Flow: %.2f m3\n", sensors[UFM2_FLOW].value);
-             break;
+            //  sensors[UFM2_FLOW].value = decodeModbusResponse_Cumulative(resp);
+            sensors[UFM2_FLOW].value  = decodeModbusResponse_UFM(resp);
+			printf("UFM2 Cumulative Flow: %.2f m3\n", sensors[UFM2_FLOW].value);
+            break;
 		
 		case UFM2_VOLUME: 
-		 	sensors[UFM2_VOLUME].value  = decodeModbusResponse_UFM(resp); 
+		 	// sensors[UFM2_VOLUME].value  = decodeModbusResponse_UFM(resp); 
+			sensors[UFM2_VOLUME].value  = decodeModbusResponse_Cumulative(resp); // Floating point
             printf("UFM2 Volume: %.3f m3/h\n",  sensors[UFM2_VOLUME].value );
             break;
 

@@ -301,14 +301,7 @@ void MODBUS_handler( uint8_t SensorSelect, uint8_t *modbusRequest)
   } 
   else if (SensorSelect == UFM_Test) {
 
-    // 0x04,  // Slave Address
-    // 0x03,  // Function Code
-    // 0x00,  // Start Address High
-    // 0X05,  // Start Address Low
-    // 0x00,  // Quantity High
-    // 0x02,  // Quantity Low
-    // 0XD4,  // CRC Low
-    // 0X5F   // CRC High
+
 
    
     modbusRequest[0] = 0X01;  // SLAVE-ID
@@ -320,14 +313,7 @@ void MODBUS_handler( uint8_t SensorSelect, uint8_t *modbusRequest)
     modbusRequest[6] = 0X15;
     modbusRequest[7] = 0XEB;
 
-    // modbusRequest[0] = 0X01;  // SLAVE-ID
-    // modbusRequest[1] = 0X06;  // FUN-CODE
-    // modbusRequest[2] = 0X00;  // START-ADD-HIGH
-    // modbusRequest[3] = 0X00;  // START-ADD-LOW
-    // modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
-    // modbusRequest[5] = 0X06;  // NO-OF-REG-LOW
-    // modbusRequest[6] = 0X09;
-    // modbusRequest[7] = 0XC8;
+
 
      uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
 
@@ -337,40 +323,8 @@ void MODBUS_handler( uint8_t SensorSelect, uint8_t *modbusRequest)
 }
 
   else if (SensorSelect == UFM1_FLOW) {
-    // Reading Positive Cumulative Flow (Address 1464 -> 0x05B7) read 1463 in modbus
-    // Sending exactly: 01 03 05 B7 00 02 74 E1
-    modbusRequest[0] = 0X01;  // SLAVE-ID
-    modbusRequest[1] = 0X03;  // FUN-CODE
-    modbusRequest[2] = 0X05;  // START-ADD-HIGH
-    modbusRequest[3] = 0XB7;  // START-ADD-LOW  (0xB7)
-    modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
-    modbusRequest[5] = 0X02;  // NO-OF-REG-LOW  (2 registers)
-    modbusRequest[6] = 0X74;  // CRC LOW
-    modbusRequest[7] = 0XE1;  // CRC HIGH
-
-    uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
-    len_of_response_num = (5 + num_registers * 2);
-  }
-  
-  else if (SensorSelect == UFM2_FLOW) {
-    // Reading Positive Cumulative Flow for Slave 2
-    modbusRequest[0] = 0X02;  // SLAVE-ID
-    modbusRequest[1] = 0X03;  // FUN-CODE
-    modbusRequest[2] = 0X05;  // START-ADD-HIGH
-    modbusRequest[3] = 0XB7;  // START-ADD-LOW  
-    modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
-    modbusRequest[5] = 0X02;  // NO-OF-REG-LOW  
-    modbusRequest[6] = 0X74;  // CRC LOW
-    modbusRequest[7] = 0XD2;  // CRC HIGH
-
-    uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
-    len_of_response_num = (5 + num_registers * 2);
-  }
-  else if (SensorSelect == UFM1_VOLUME) {
-
-
-  /*  Adrs | num of reg | data type |      Content      |      Unit       */
-  /*  1447 |      2     | IEEE754   | Instantaneousflow | Unit:cubicmeter */
+    /*  Adrs | num of reg | data type |      Content      |      Unit       */
+    /*  1447 |      2     | IEEE754   | Instantaneousflow | Unit:cubicmeter */
 
     modbusRequest[0] = 0X01;  // SLAVE-ID
     modbusRequest[1] = 0X03;  // FUN-CODE
@@ -385,11 +339,12 @@ void MODBUS_handler( uint8_t SensorSelect, uint8_t *modbusRequest)
 
     // Response: Slave ID (1) + Function Code (1) + Byte Count (1) + N*2 bytes + CRC (2)
      len_of_response_num = (5 + num_registers * 2);
-   }
+    
+  }
   
-  else if (SensorSelect == UFM2_VOLUME) {
+  else if (SensorSelect == UFM2_FLOW) {
 
-//1445
+    //1445
     modbusRequest[0] = 0X02;  // SLAVE-ID
     modbusRequest[1] = 0X03;  // FUN-CODE
     modbusRequest[2] = 0X05;  // START-ADD-HIGH
@@ -403,6 +358,41 @@ void MODBUS_handler( uint8_t SensorSelect, uint8_t *modbusRequest)
 
     // Response: Slave ID (1) + Function Code (1) + Byte Count (1) + N*2 bytes + CRC (2)
      len_of_response_num = (5 + num_registers * 2);
+
+  }
+  else if (SensorSelect == UFM1_VOLUME) {
+
+
+    // Reading Positive Cumulative Flow (Address 1464 -> 0x05B7) read 1463 in modbus
+    // Sending exactly: 01 03 05 B7 00 02 74 E1
+    modbusRequest[0] = 0X01;  // SLAVE-ID
+    modbusRequest[1] = 0X03;  // FUN-CODE
+    modbusRequest[2] = 0X05;  // START-ADD-HIGH
+    modbusRequest[3] = 0XB7;  // START-ADD-LOW  (0xB7)
+    modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
+    modbusRequest[5] = 0X02;  // NO-OF-REG-LOW  (2 registers)
+    modbusRequest[6] = 0X74;  // CRC LOW
+    modbusRequest[7] = 0XE1;  // CRC HIGH
+
+    uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
+    len_of_response_num = (5 + num_registers * 2);
+   }
+  
+  else if (SensorSelect == UFM2_VOLUME) {
+
+    // Reading Positive Cumulative Flow for Slave 2
+    modbusRequest[0] = 0X02;  // SLAVE-ID
+    modbusRequest[1] = 0X03;  // FUN-CODE
+    modbusRequest[2] = 0X05;  // START-ADD-HIGH
+    modbusRequest[3] = 0XB7;  // START-ADD-LOW  
+    modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
+    modbusRequest[5] = 0X02;  // NO-OF-REG-LOW  
+    modbusRequest[6] = 0X74;  // CRC LOW
+    modbusRequest[7] = 0XD2;  // CRC HIGH
+
+    uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
+    len_of_response_num = (5 + num_registers * 2);
+
   }
 
 
