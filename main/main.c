@@ -1609,8 +1609,9 @@ void collect_and_log(void)
 
 	/* Pump Feedback Relay (SW1ob) */
     // Note: SW1 is GPIO 34
-    sensors[SW1ob].value = (float)(!gpio_get_level(SW1));
-    ESP_LOGI("POLL", "Pump Feedback (SW1ob): %.0f", sensors[SW1ob].value);
+    /* SW1ob onboard GPIO — not used for FLOW_SW (that comes from Modbus SW1_mod) */
+	sensors[SW1ob].value = 0.0f;
+	sensors[SW1ob].is_enabled = false;  // exclude from JSON log
 
 	// /* --- HIJACK UFM_Test FOR PUMP FEEDBACK --- */
     // // Reading SW1 (GPIO 34, mapped to OP1 terminal)
@@ -1888,16 +1889,16 @@ void print_sensor_name(uint8_t sensor)
 			break;
 
 		case SW1_mod:
-			printf("SW1 MOD\n");
+			printf("FLOW_SW\n");
 			break;
 
 		case SW2_mod:
 			printf("SW2 MOD\n");
 			break;	
 
-		case UFM_Test:
-			 printf("UFM_Test\n");
-			 break;
+		// case UFM_Test:
+		// 	 printf("UFM_Test\n");
+		// 	 break;
 
 		case UFM1_FLOW:
 			 printf("UFM1_FLOW\n");
@@ -2059,7 +2060,7 @@ void sensor_modbus_requests()
 
 		case SW1_mod:
 		    sensors[SW1_mod].value = (resp[3] << 8) | resp[4];
-            printf("SW1 MOD: %f\n", sensors[SW1_mod].value);
+            printf("FLOW_SW: %f\n", sensors[SW1_mod].value);
             break;
 		
 		case SW2_mod:
@@ -2067,10 +2068,10 @@ void sensor_modbus_requests()
             printf("SW2 MOD: %f\n",  sensors[SW2_mod].value );
             break;
 
-		case UFM_Test:
-			//  float test = decodeModbusResponse_UFM(resp);
-			//  printf("UFM Test: %f\n",test);
-			 break;
+		// case UFM_Test:
+		// 	//  float test = decodeModbusResponse_UFM(resp);
+		// 	//  printf("UFM Test: %f\n",test);
+		// 	 break;
 
 		case UFM1_FLOW: // Cumulative Flow 
 			// 	sensors[UFM1_FLOW].value  = decodeModbusResponse_Cumulative(resp)* 1000.0;
@@ -2572,19 +2573,20 @@ void app_main(void)
 	// clear_device_status_nvs();
 	// clear_device_config_nvs(); // CLEAR the sensor data if required.
 
-	// Try to load saved sensors, else set defaults
-	if ( load_sensors_from_nvs() != ESP_OK ) 
-	{
-	    // Set default values manually
-	    ESP_LOGW(TAG_NVS, "Using default sensor config");
-	    init_default_sensors();  // You define this function to populate sensors[]
-	    save_sensors_to_nvs();   // Save them for future
-	}
-	else
-	{
-		printf("NVS load Success \n");
-	}
-	
+	// // Try to load saved sensors, else set defaults
+	// if ( load_sensors_from_nvs() != ESP_OK ) 
+	// {
+	//     // Set default values manually
+	//     ESP_LOGW(TAG_NVS, "Using default sensor config");
+	//     init_default_sensors();  // You define this function to populate sensors[]
+	//     save_sensors_to_nvs();   // Save them for future
+	// }
+	// else
+	// {
+	// 	printf("NVS load Success \n");
+	// }
+	load_sensors_with_version_check();
+
 	/*NVS Read Section Ends*/
 
 

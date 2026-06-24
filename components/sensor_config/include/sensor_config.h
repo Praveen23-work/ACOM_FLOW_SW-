@@ -10,12 +10,18 @@
 
 /* Sensor Data */
 
+
+
 #define MAX_SENSOR_NAME_LEN 24 //Updated from 12 to 24
 #define MAX_JSON_SIZE 512
 
 #define SENSOR_NAMESPACE "sensor_config"
 #define SENSOR_KEY       "sensors"
-#define MAX_SENSORS      18
+#define MAX_SENSORS      17
+
+#define SENSOR_CONFIG_VERSION  2
+#define SENSOR_VER_NAMESPACE  "sens_meta"   // separate from "sensor_config"
+#define SENSOR_VER_KEY        "sens_ver"
 
 extern int sensor_count;
 static const char *TAG_NVS = "NVS";
@@ -26,6 +32,7 @@ esp_err_t load_sensors_from_nvs();
 esp_err_t clear_sensor_nvs_namespace(void);
 void print_sensor_data(void) ;
 int get_sensor_count(void);
+esp_err_t load_sensors_with_version_check(void);
 
 //esp_err_t load_sensors_from_nvs(void);
 
@@ -40,7 +47,7 @@ typedef enum {
   TURBIDITY,
   SW1_mod,
   SW2_mod,
-  UFM_Test,
+//   UFM_Test,
   UFM1_FLOW,
   UFM1_VOLUME,
   UFM2_FLOW,

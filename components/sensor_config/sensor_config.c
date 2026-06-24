@@ -218,9 +218,9 @@ void init_default_sensors()
         [CHLORINE_NC]     = {"Chlorine NC",       "CLO_NC",  true, true, 0.0, 1.00, 0.0, false},
         [WEIGHT_SENSOR]   = {"Weight Sensor",     "WGT",     true, true, 0.0, 1.00, 0.0, false},
         [TURBIDITY]       = {"Turbidity",         "TBD",     true, false,0.0, 1.00, 0.0, false},
-        [SW1_mod]         = {"Switch 1",          "SW1",     true, false,0.0, 1.00, 0.0, false},
+        [SW1_mod]         = {"Flow Switch",          "FLOW_SW", true, false,0.0, 1.00, 0.0, false},
         [SW2_mod]         = {"Switch 2",          "SW2",     true, false,0.0, 1.00, 0.0, false},
-        [UFM_Test]        = {"Ultrasonic Test",   "UFM-T",   true, true, 0.0, 1.00, 0.0, false},
+        // [UFM_Test]        = {"Ultrasonic Test",   "UFM-T",   true, true, 0.0, 1.00, 0.0, false},
         [UFM1_FLOW]       = {"Ultrasonic Flow1",  "UFM1F",   true, true, 0.0, 1.00, 0.0, false},
         [UFM1_VOLUME]     = {"Ultrasonic Vol1",   "UFM1V",   true, true, 0.0, 2.00, 0.0, false},
         [UFM2_FLOW]       = {"Ultrasonic Flow2",  "UFM2F",   true, true, 0.0, 1.00, 0.0, false},
@@ -230,8 +230,8 @@ void init_default_sensors()
         /* --- NON-MODBUS EXTRA REG SENSORS (ORDERED BY reg_sensor_e) --- */
         [TPA]             = {"TempA",             "TPA",     true, false,0.0, 1.00, 0.0, false},
         [FLW]             = {"Flow Sensor",       "FLW",     true, false,0.0, 1.00, 0.0, false},
-        [SW1ob]           = {"Flow Switch",       "FLOW_SW",     true, false,0.0, 1.00, 0.0, false},
-        [SW2ob]           = {"Sw2 oboard",        "SW2ob",     true, false,0.0, 1.00, 0.0, false}
+        // [SW1ob]           = {"Sw1 oboard",        "SW1ob",     true, false,0.0, 1.00, 0.0, false},
+        // [SW2ob]           = {"Sw2 oboard",        "SW2ob",     true, false,0.0, 1.00, 0.0, false}
     };
     memcpy(sensors, default_sensors, sizeof(default_sensors));
 }
@@ -314,7 +314,40 @@ void print_sensor_data(void) {
 // }
 
 
+esp_err_t load_sensors_with_version_check(void)
+{
+    nvs_handle_t handle;
+    int32_t stored_ver = 0;
 
+    if (nvs_open(SENSOR_VER_NAMESPACE, NVS_READONLY, &handle) == ESP_OK) {
+        nvs_get_i32(handle, SENSOR_VER_KEY, &stored_ver);
+        nvs_close(handle);
+    }
+
+    if (stored_ver != SENSOR_CONFIG_VERSION) {
+        ESP_LOGW("NVS", "Sensor config version mismatch (stored=%ld expected=%d) — resetting",
+                 stored_ver, SENSOR_CONFIG_VERSION);
+        clear_sensor_nvs_namespace();
+        init_default_sensors();
+        save_sensors_to_nvs();
+
+        if (nvs_open(SENSOR_VER_NAMESPACE, NVS_READWRITE, &handle) == ESP_OK) {
+            nvs_set_i32(handle, SENSOR_VER_KEY, (int32_t)SENSOR_CONFIG_VERSION);
+            nvs_commit(handle);
+            nvs_close(handle);
+        }
+        return ESP_OK;
+    }
+
+    /* Version matches but blob may be missing (e.g. manual button clear) */
+    esp_err_t ret = load_sensors_from_nvs();
+    if (ret != ESP_OK) {
+        ESP_LOGW("NVS", "Sensor blob missing despite version match — reinitialising defaults");
+        init_default_sensors();
+        save_sensors_to_nvs();
+    }
+    return ESP_OK;
+}
 
 
 void process_sensor_config_data(const char *data) 

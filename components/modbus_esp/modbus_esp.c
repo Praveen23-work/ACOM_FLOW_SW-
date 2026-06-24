@@ -299,28 +299,28 @@ void MODBUS_handler( uint8_t SensorSelect, uint8_t *modbusRequest)
      len_of_response_num = (5 + num_registers * 2);
     // SensorSelect = 0;
   } 
-  else if (SensorSelect == UFM_Test) {
+//   else if (SensorSelect == UFM_Test) {
 
 
 
    
-    modbusRequest[0] = 0X01;  // SLAVE-ID
-    modbusRequest[1] = 0X03;  // FUN-CODE
-    modbusRequest[2] = 0X01;  // START-ADD-HIGH
-    modbusRequest[3] = 0X69;  // START-ADD-LOW
-    modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
-    modbusRequest[5] = 0X02;  // NO-OF-REG-LOW
-    modbusRequest[6] = 0X15;
-    modbusRequest[7] = 0XEB;
+//     modbusRequest[0] = 0X01;  // SLAVE-ID
+//     modbusRequest[1] = 0X03;  // FUN-CODE
+//     modbusRequest[2] = 0X01;  // START-ADD-HIGH
+//     modbusRequest[3] = 0X69;  // START-ADD-LOW
+//     modbusRequest[4] = 0X00;  // NO-OF-REG-HIGH
+//     modbusRequest[5] = 0X02;  // NO-OF-REG-LOW
+//     modbusRequest[6] = 0X15;
+//     modbusRequest[7] = 0XEB;
 
 
 
-     uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
+//      uint16_t num_registers = (modbusRequest[4] << 8) | modbusRequest[5];
 
-    // Response: Slave ID (1) + Function Code (1) + Byte Count (1) + N*2 bytes + CRC (2)
-     len_of_response_num = (5 + num_registers * 2);
-    //  ESP_LOGW("Mod_LEN", "Expected Response Length: %d\n",len_of_response_num);
-}
+//     // Response: Slave ID (1) + Function Code (1) + Byte Count (1) + N*2 bytes + CRC (2)
+//      len_of_response_num = (5 + num_registers * 2);
+//     //  ESP_LOGW("Mod_LEN", "Expected Response Length: %d\n",len_of_response_num);
+// }
 
   else if (SensorSelect == UFM1_FLOW) {
     /*  Adrs | num of reg | data type |      Content      |      Unit       */
